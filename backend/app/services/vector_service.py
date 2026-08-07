@@ -45,6 +45,11 @@ def store_chunks(chunks, user_id, source):
         for chunk in chunks
     ]
 
+    # DEBUG BEFORE INSERT
+    print("First metadata:", metadatas[0])
+    print("First ID:", ids[0])
+    print("Embedding dimension:", len(embeddings[0]))
+
     collection.add(
         ids=ids,
         documents=texts,
@@ -54,7 +59,23 @@ def store_chunks(chunks, user_id, source):
 
     print("Chunks stored successfully!")
     print("COLLECTION COUNT:", collection.count())
-    print("PEEK:", collection.peek())
+
+    # VERIFY INSERT
+    test = collection.get(
+        where={
+            "user_id": user_id,
+        }
+    )
+
+    print("Stored IDs:")
+    print(test["ids"])
+
+    print("Stored metadata:")
+    print(test["metadatas"])
+
+    print("PEEK:")
+    print(collection.peek())
+
 
 def delete_document_embeddings(user_id, source):
     results = collection.get(

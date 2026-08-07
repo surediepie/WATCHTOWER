@@ -8,7 +8,8 @@ def search_documents(query, user_id, n_results=5):
     print("Search user_id type:", type(user_id))
 
     embedding = model.encode(query).tolist()
-
+    print("Searching user_id:", user_id)
+    print("Searching user_id type:", type(user_id))
     results = collection.query(
         query_embeddings=[embedding],
         n_results=n_results,
