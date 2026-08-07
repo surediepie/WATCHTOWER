@@ -83,8 +83,14 @@ async def upload_pdf(
         shutil.copyfileobj(file.file, buffer)
 
     pages = extract_text(file_path)
+    print("Pages:", len(pages))
+    print(pages[:2])
+    print("Pages extracted:", len(pages))
+    print(pages[:2])
 
     chunks = chunk_text(pages)
+    print("Chunks:", len(chunks))
+    print("Chunks created:", len(chunks))
 
     store_chunks(
     chunks,
@@ -202,8 +208,13 @@ def register(
     db.commit()
     db.refresh(new_user)
 
+    token = create_access_token(
+        {"sub": new_user.email}
+    )
+
     return {
-        "message": "User registered successfully",
+        "access_token": token,
+        "token_type": "bearer",
         "user": {
             "id": new_user.id,
             "name": new_user.name,

@@ -21,6 +21,10 @@ print("Embedding model loaded!")
 def store_chunks(chunks, user_id, source):
     print(f"Storing {len(chunks)} chunks...")
 
+    print("USER:", user_id)
+    print("SOURCE:", source)
+    print("CHUNKS:", len(chunks))
+
     texts = [
         chunk["text"]
         for chunk in chunks
@@ -50,8 +54,8 @@ def store_chunks(chunks, user_id, source):
     )
 
     print("Chunks stored successfully!")
-    print("Total documents:", collection.count())
-
+    print("COLLECTION COUNT:", collection.count())
+    print("PEEK:", collection.peek())
 
 def delete_document_embeddings(user_id, source):
     results = collection.get(
