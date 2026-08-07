@@ -26,12 +26,17 @@ from app.dependencies import get_current_user
 
 from app.services.pdf_service import extract_text
 from app.services.chunk_service import chunk_text
-from app.services.vector_service import store_chunks
+from app.services.vector_service import (
+    store_chunks,
+    delete_document_embeddings,
+)
 from app.services.search_service import search_documents
 from app.services.gemini_service import ask_gemini
 from app.services.document_service import (
     create_document,
     get_user_documents,
+    get_document,
+    delete_document,
 )
 
 app = FastAPI(title="WATCHTOWER API")
@@ -76,15 +81,15 @@ async def upload_pdf(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    text = extract_text(file_path)
+    pages = extract_text(file_path)
 
-    chunks = chunk_text(text)
+    chunks = chunk_text(pages)
 
     store_chunks(
-        chunks,
-        current_user.id,
-        file.filename,
-    )
+    chunks,
+    current_user.id,
+    file.filename,
+)
 
     create_document(
         db=db,
@@ -96,7 +101,7 @@ async def upload_pdf(
     return {
         "message": "Upload successful",
         "filename": file.filename,
-        "characters": len(text),
+        "pages": len(pages),
         "chunks": len(chunks),
     }
 
@@ -123,6 +128,46 @@ def documents(
         }
         for doc in docs
     ]
+
+@app.delete("/documents/{document_id}")
+def delete_user_document(
+    document_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    document = get_document(
+        db,
+        document_id,
+        current_user.id,
+    )
+
+    if document is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found",
+        )
+
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        document.filename,
+    )
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    delete_document_embeddings(
+        current_user.id,
+        document.filename,
+    )
+
+    delete_document(
+        db,
+        document,
+    )
+
+    return {
+        "message": "Document deleted successfully",
+    }
 
 
 # -------------------------------------------------

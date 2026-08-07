@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import CitationPanel from "./CitationPanel";
 
 interface Source {
   text: string;
   source: string;
+  page: number;
   distance: number;
 }
 
@@ -82,35 +84,46 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-[#111827] p-6">
-      <h2 className="mb-4 text-xl font-semibold text-white">
+    <div className="rounded-2xl bg-[#111827] p-6">
+      <h2 className="mb-6 text-xl font-semibold text-white">
         AI Assistant
       </h2>
 
-      <div className="mb-4 h-[350px] overflow-y-auto rounded-xl border border-gray-700 bg-[#1F2937] p-4 space-y-3">
+      <div className="mb-4 h-[500px] overflow-y-auto rounded-xl border border-gray-700 bg-[#1F2937] p-4 space-y-6">
         {messages.length === 0 ? (
           <p className="text-gray-400">
             Your conversation will appear here.
           </p>
         ) : (
           messages.map((msg, index) => (
-            <div
-              key={index}
-              className={
-                msg.role === "user"
-                  ? "text-right"
-                  : "text-left"
-              }
-            >
+            <div key={index}>
               <div
                 className={
                   msg.role === "user"
-                    ? "inline-block rounded-lg bg-purple-600 px-4 py-2 text-white"
-                    : "inline-block rounded-lg bg-gray-700 px-4 py-2 text-white"
+                    ? "text-right"
+                    : "text-left"
                 }
               >
-                {msg.text}
+                <div
+                  className={
+                    msg.role === "user"
+                      ? "inline-block max-w-[85%] rounded-lg bg-purple-600 px-4 py-3 text-white"
+                      : "inline-block max-w-[85%] rounded-lg bg-gray-700 px-4 py-3 text-white"
+                  }
+                >
+                  {msg.text}
+                </div>
               </div>
+
+              {msg.role === "assistant" &&
+                msg.sources &&
+                msg.sources.length > 0 && (
+                  <div className="mt-4">
+                    <CitationPanel
+                      sources={msg.sources}
+                    />
+                  </div>
+                )}
             </div>
           ))
         )}
@@ -126,7 +139,9 @@ export default function ChatWindow() {
         <input
           type="text"
           value={question}
-          onChange={(e) => setQuestion(e.target.value)}
+          onChange={(e) =>
+            setQuestion(e.target.value)
+          }
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               sendQuestion();
@@ -138,7 +153,7 @@ export default function ChatWindow() {
 
         <button
           onClick={sendQuestion}
-          className="rounded-lg bg-purple-600 px-6 py-3 font-medium text-white hover:bg-purple-700"
+          className="rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition hover:bg-purple-700"
         >
           Send
         </button>

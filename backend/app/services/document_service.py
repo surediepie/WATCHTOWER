@@ -34,12 +34,12 @@ def get_user_documents(
     )
 
 
-def delete_document(
+def get_document(
     db: Session,
     document_id: int,
     user_id: int,
 ):
-    document = (
+    return (
         db.query(Document)
         .filter(
             Document.id == document_id,
@@ -48,8 +48,10 @@ def delete_document(
         .first()
     )
 
-    if document:
-        db.delete(document)
-        db.commit()
 
-    return document
+def delete_document(
+    db: Session,
+    document: Document,
+):
+    db.delete(document)
+    db.commit()

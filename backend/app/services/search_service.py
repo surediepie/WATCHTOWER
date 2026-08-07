@@ -7,16 +7,22 @@ def search_documents(query, user_id, n_results=5):
     results = collection.query(
         query_embeddings=[embedding],
         n_results=n_results,
-        where={"user_id": user_id},
+        where={
+            "user_id": user_id,
+        },
     )
 
     sources = []
+
+    if not results["documents"] or not results["documents"][0]:
+        return sources
 
     for i in range(len(results["documents"][0])):
         sources.append(
             {
                 "text": results["documents"][0][i],
                 "source": results["metadatas"][0][i]["source"],
+                "page": results["metadatas"][0][i]["page"],
                 "distance": results["distances"][0][i],
             }
         )

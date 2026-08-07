@@ -21,7 +21,12 @@ print("Embedding model loaded!")
 def store_chunks(chunks, user_id, source):
     print(f"Storing {len(chunks)} chunks...")
 
-    embeddings = model.encode(chunks).tolist()
+    texts = [
+        chunk["text"]
+        for chunk in chunks
+    ]
+
+    embeddings = model.encode(texts).tolist()
 
     ids = [
         f"user{user_id}_{source}_{i}"
@@ -32,16 +37,43 @@ def store_chunks(chunks, user_id, source):
         {
             "user_id": user_id,
             "source": source,
+            "page": chunk["page"],
         }
-        for _ in chunks
+        for chunk in chunks
     ]
 
     collection.add(
         ids=ids,
-        documents=chunks,
+        documents=texts,
         embeddings=embeddings,
         metadatas=metadatas,
     )
 
     print("Chunks stored successfully!")
     print("Total documents:", collection.count())
+
+
+def delete_document_embeddings(user_id, source):
+    results = collection.get(
+        where={
+            "$and": [
+                {
+                    "user_id": user_id,
+                },
+                {
+                    "source": source,
+                },
+            ]
+        }
+    )
+
+    if results["ids"]:
+        collection.delete(
+            ids=results["ids"],
+        )
+
+        print(
+            f"Deleted {len(results['ids'])} embeddings."
+        )
+    else:
+        print("No embeddings found.")
