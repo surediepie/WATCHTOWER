@@ -278,6 +278,15 @@ def login(
 class ChatRequest(BaseModel):
     question: str
 
+
+# -------------------------------------------------
+# Chat
+# -------------------------------------------------
+
+class ChatRequest(BaseModel):
+    question: str
+
+
 @app.post("/chat")
 async def chat(
     request: ChatRequest,
@@ -300,7 +309,14 @@ async def chat(
 
     ai_answer = explain_with_ai(
         request.question,
+        document_answer,
     )
+
+    print("DOCUMENT ANSWER:")
+    print(document_answer)
+
+    print("AI ANSWER:")
+    print(ai_answer)
 
     return {
         "question": request.question,

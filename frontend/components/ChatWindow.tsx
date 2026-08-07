@@ -12,7 +12,9 @@ interface Source {
 
 interface Message {
   role: "user" | "assistant";
-  text: string;
+  text?: string;
+  documentAnswer?: string;
+  aiAnswer?: string;
   sources?: Source[];
 }
 
@@ -64,7 +66,8 @@ export default function ChatWindow() {
         ...prev,
         {
           role: "assistant",
-          text: data.answer,
+          documentAnswer: data.document_answer,
+          aiAnswer: data.ai_answer,
           sources: data.sources,
         },
       ]);
@@ -75,7 +78,8 @@ export default function ChatWindow() {
         ...prev,
         {
           role: "assistant",
-          text: "Unable to get a response.",
+          documentAnswer: "Unable to retrieve document information.",
+          aiAnswer: "Unable to connect to the AI service.",
         },
       ]);
     } finally {
@@ -90,6 +94,7 @@ export default function ChatWindow() {
       </h2>
 
       <div className="mb-4 h-[500px] overflow-y-auto rounded-xl border border-gray-700 bg-[#1F2937] p-4 space-y-6">
+
         {messages.length === 0 ? (
           <p className="text-gray-400">
             Your conversation will appear here.
@@ -97,33 +102,54 @@ export default function ChatWindow() {
         ) : (
           messages.map((msg, index) => (
             <div key={index}>
-              <div
-                className={
-                  msg.role === "user"
-                    ? "text-right"
-                    : "text-left"
-                }
-              >
-                <div
-                  className={
-                    msg.role === "user"
-                      ? "inline-block max-w-[85%] rounded-lg bg-purple-600 px-4 py-3 text-white"
-                      : "inline-block max-w-[85%] rounded-lg bg-gray-700 px-4 py-3 text-white"
-                  }
-                >
-                  {msg.text}
-                </div>
-              </div>
-
-              {msg.role === "assistant" &&
-                msg.sources &&
-                msg.sources.length > 0 && (
-                  <div className="mt-4">
-                    <CitationPanel
-                      sources={msg.sources}
-                    />
+              {msg.role === "user" ? (
+                <div className="text-right">
+                  <div className="inline-block max-w-[85%] rounded-lg bg-purple-600 px-4 py-3 text-white">
+                    {msg.text}
                   </div>
-                )}
+                </div>
+              ) : (
+                <div className="rounded-xl bg-gray-800 p-6 space-y-6 border border-gray-700">
+
+                  <div>
+  <h3 className="mb-3 text-lg font-semibold text-purple-400">
+    📄 From Uploaded Documents
+  </h3>
+
+  <div className="rounded-lg bg-gray-700 p-4 whitespace-pre-wrap text-gray-100">
+    {msg.documentAnswer ?? (
+      <span className="text-yellow-300">
+        No relevant information was found in the uploaded documents.
+      </span>
+    )}
+  </div>
+</div>
+
+                  {msg.sources &&
+                    msg.sources.length > 0 && (
+                      <div>
+                        <h3 className="mb-3 text-lg font-semibold text-purple-400">
+                          📚 Citations
+                        </h3>
+
+                        <CitationPanel
+                          sources={msg.sources}
+                        />
+                      </div>
+                    )}
+
+                  <div>
+                    <h3 className="mb-3 text-lg font-semibold text-purple-400">
+                      💡 AI Explanation
+                    </h3>
+
+                    <div className="rounded-lg bg-gray-700 p-4 whitespace-pre-wrap text-gray-100">
+                      {msg.aiAnswer}
+                    </div>
+                  </div>
+
+                </div>
+              )}
             </div>
           ))
         )}
@@ -153,9 +179,10 @@ export default function ChatWindow() {
 
         <button
           onClick={sendQuestion}
-          className="rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition hover:bg-purple-700"
+          disabled={loading}
+          className="rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition hover:bg-purple-700 disabled:opacity-50"
         >
-          Send
+          {loading ? "Thinking..." : "Send"}
         </button>
       </div>
     </div>
