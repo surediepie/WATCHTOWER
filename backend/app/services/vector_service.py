@@ -22,6 +22,7 @@ def store_chunks(chunks, user_id, source):
     print(f"Storing {len(chunks)} chunks...")
 
     print("USER:", user_id)
+    print("Stored user_id type:", type(user_id))
     print("SOURCE:", source)
     print("CHUNKS:", len(chunks))
 

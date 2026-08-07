@@ -5,6 +5,7 @@ def search_documents(query, user_id, n_results=5):
     print("SEARCH CALLED")
     print("Query:", query)
     print("User ID:", user_id)
+    print("Search user_id type:", type(user_id))
 
     embedding = model.encode(query).tolist()
 
