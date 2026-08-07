@@ -1,36 +1,236 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+<img src="frontend/public/WATCHTOWER_logo.jpg" width="180"/>
 
-First, run the development server:
+# WATCHTOWER
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### AI-Powered Document Intelligence Platform
+
+*"Every Answer. Verified. Every Source. Within Reach."*
+
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)]()
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)]()
+[![Next.js](https://img.shields.io/badge/Next.js-Frontend-black.svg)]()
+[![Gemini](https://img.shields.io/badge/Google-Gemini_AI-4285F4.svg)]()
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_DB-orange.svg)]()
+
+</div>
+
+---
+
+# Overview
+
+WATCHTOWER is an AI-powered document intelligence platform that enables users to search, understand, and verify information from institutional documents using Retrieval-Augmented Generation (RAG).
+
+Instead of manually searching through lengthy PDFs, users can upload documents and ask natural language questions. WATCHTOWER retrieves the most relevant information using semantic search and generates accurate, context-aware answers with Google Gemini AI.
+
+---
+
+# Problem Statement
+
+Students and professionals often spend significant time searching through large documents such as:
+
+- Academic notes
+- College guidelines
+- Research papers
+- Policy documents
+- Manuals
+- Reports
+
+Traditional keyword search frequently misses relevant information because it relies on exact word matches rather than meaning.
+
+WATCHTOWER solves this problem using semantic search and AI-powered document understanding.
+
+---
+
+# Features
+
+- AI-powered document question answering
+- PDF upload and processing
+- Semantic search using vector embeddings
+- Retrieval-Augmented Generation (RAG)
+- Google Gemini AI integration
+- User authentication
+- Fast document retrieval with ChromaDB
+- Clean and responsive web interface
+- Secure document-based responses
+
+---
+
+# How WATCHTOWER Works
+
+```text
+                Upload PDF
+                     │
+                     ▼
+           Extract Text (PyMuPDF)
+                     │
+                     ▼
+              Text Chunking
+                     │
+                     ▼
+      Sentence Transformer Embeddings
+                     │
+                     ▼
+          Store in ChromaDB
+                     │
+                     ▼
+          User asks a Question
+                     │
+                     ▼
+          Semantic Similarity Search
+                     │
+                     ▼
+       Relevant Chunks Retrieved
+                     │
+                     ▼
+          Google Gemini AI
+                     │
+                     ▼
+          Intelligent Answer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Frontend
 
-## Learn More
+- Next.js
+- React
+- Tailwind CSS
+- TypeScript
 
-To learn more about Next.js, take a look at the following resources:
+## Backend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- FastAPI
+- SQLAlchemy
+- JWT Authentication
+- PyMuPDF
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Artificial Intelligence
 
-## Deploy on Vercel
+- Google Gemini 3.5 Flash
+- Sentence Transformers
+- all-MiniLM-L6-v2
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- SQLite
+- ChromaDB (Vector Database)
+
+## Deployment
+
+- Railway
+- GitHub
+
+---
+
+# Project Structure
+
+```text
+WATCHTOWER/
+
+├── backend/
+│   ├── app/
+│   ├── uploads/
+│   ├── chroma_db/
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── public/
+│   └── package.json
+│
+├── README.md
+└── LICENSE
+```
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/surediepie/WATCHTOWER.git
+
+cd WATCHTOWER
+```
+
+---
+
+## Backend
+
+```bash
+cd backend
+
+python -m venv venv
+
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload
+```
+
+---
+
+## Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+---
+
+# Team
+
+| Name | Role |
+|------|------|
+| Priyam Kumar | Team Lead • Backend & AI Engineer |
+| Pritam Nayak | System Integration Engineer |
+| Somesh Jena | Frontend Engineer |
+| Somanath Kundu | UI Engineer |
+
+---
+
+# Future Enhancements
+
+- Multi-document search
+- OCR support for scanned PDFs
+- Citation highlighting
+- Role-based access control
+- Document summarization
+- Multi-language support
+- Voice-based document queries
+- Cloud storage integration
+
+---
+
+# Repository
+
+GitHub
+
+https://github.com/surediepie/WATCHTOWER
+
+---
+
+# License
+
+This project is licensed under the MIT License.
+
+---
+
+<div align="center">
+
+### Built with ❤️ by Team WATCHTOWER
+
+*"Every Answer. Verified. Every Source. Within Reach."*
+
+</div>
