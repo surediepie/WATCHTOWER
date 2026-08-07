@@ -31,7 +31,10 @@ from app.services.vector_service import (
     delete_document_embeddings,
 )
 from app.services.search_service import search_documents
-from app.services.gemini_service import ask_gemini
+from app.services.gemini_service import (
+    summarize_document,
+    explain_with_ai,
+)
 from app.services.document_service import (
     create_document,
     get_user_documents,
@@ -275,7 +278,6 @@ def login(
 class ChatRequest(BaseModel):
     question: str
 
-
 @app.post("/chat")
 async def chat(
     request: ChatRequest,
@@ -291,13 +293,18 @@ async def chat(
         for source in results
     )
 
-    answer = ask_gemini(
+    document_answer = summarize_document(
         request.question,
         context,
     )
 
+    ai_answer = explain_with_ai(
+        request.question,
+    )
+
     return {
         "question": request.question,
-        "answer": answer,
+        "document_answer": document_answer,
+        "ai_answer": ai_answer,
         "sources": results,
     }
