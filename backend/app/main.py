@@ -10,8 +10,18 @@ from app.services.chunk_service import chunk_text
 from app.services.vector_service import store_chunks
 from app.services.search_service import search_documents
 from app.services.gemini_service import ask_gemini
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
+from app.database import get_db
+from app.models import User
+from app.schemas import UserCreate
+from app.auth import hash_password
+from app.database import engine, Base
+import app.models
 
 app = FastAPI(title="WATCHTOWER API")
+Base.metadata.create_all(bind=engine)
 
 # CORS
 app.add_middleware(
@@ -76,6 +86,31 @@ def get_documents():
 class ChatRequest(BaseModel):
     question: str
 
+@app.post("/register")
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if existing_user:
+        return {"message": "Email already registered"}
+
+    new_user = User(
+        name=user.name,
+        email=user.email,
+        password=hash_password(user.password)
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "User registered successfully",
+        "user": {
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email
+        }
+    }
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
