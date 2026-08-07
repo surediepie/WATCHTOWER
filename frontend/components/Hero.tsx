@@ -1,16 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex min-h-[80vh] max-w-7xl items-center justify-between px-8">
+    <section className="mx-auto flex min-h-[90vh] max-w-7xl items-center justify-between px-6">
       {/* Left */}
       <div className="max-w-2xl">
         <h1 className="text-6xl font-extrabold leading-tight text-white">
           Every Answer
           <br />
-          <span className="text-purple-500">
-            Verified
-          </span>
+          <span className="text-purple-500">Verified</span>
           <br />
           Every Source
           <br />
@@ -18,8 +17,8 @@ export default function Hero() {
         </h1>
 
         <p className="mt-8 text-lg text-gray-400">
-          Search, understand, and verify institutional
-          documents with confidence.
+          Search, understand, and verify institutional documents with
+          confidence.
         </p>
 
         <div className="mt-10 flex gap-4">
@@ -41,8 +40,15 @@ export default function Hero() {
 
       {/* Right */}
       <div className="flex items-center justify-center">
-        <div className="h-[500px] w-[500px] rounded-2xl border border-gray-700 bg-[#111827] shadow-2xl">
-          {/* Logo / Illustration */}
+        <div className="flex h-[500px] w-[500px] items-center justify-center rounded-2xl border border-gray-700 bg-[#111827] shadow-2xl">
+          <Image
+            src="/WATCHTOWER_logo.jpg"
+            alt="WATCHTOWER Logo"
+            width={420}
+            height={420}
+            priority
+            className="object-contain"
+          />
         </div>
       </div>
     </section>
