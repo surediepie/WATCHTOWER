@@ -8,7 +8,6 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
@@ -17,16 +16,19 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const response = await fetch("http://127.0.0.1:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -55,8 +57,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#0B0F19]">
-      <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-[#111827] p-8">
+    <main className="flex min-h-screen items-center justify-center bg-[#0F172A]">
+      <div className="w-full max-w-md rounded-2xl bg-[#111827] p-8 shadow-xl">
         <h1 className="text-center text-3xl font-bold text-white">
           Welcome Back
         </h1>

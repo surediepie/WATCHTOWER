@@ -41,7 +41,7 @@ export default function ChatWindow() {
       const token = localStorage.getItem("access_token");
 
       const response = await fetch(
-        "http://127.0.0.1:8000/chat",
+        `${process.env.NEXT_PUBLIC_API_URL}/chat`,
         {
           method: "POST",
           headers: {
@@ -84,8 +84,8 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="rounded-2xl bg-[#111827] p-6">
-      <h2 className="mb-6 text-xl font-semibold text-white">
+    <div>
+      <h2 className="mb-4 text-xl font-semibold text-white">
         AI Assistant
       </h2>
 

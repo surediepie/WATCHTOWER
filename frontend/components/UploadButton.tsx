@@ -22,7 +22,7 @@ export default function UploadButton() {
       setUploading(true);
 
       const response = await fetch(
-        "http://127.0.0.1:8000/upload",
+        `${process.env.NEXT_PUBLIC_API_URL}/upload`,
         {
           method: "POST",
           headers: {
@@ -50,8 +50,8 @@ export default function UploadButton() {
   }
 
   return (
-    <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl bg-purple-600 px-5 py-3 font-medium text-white transition hover:bg-purple-700">
-      <Upload size={20} />
+    <label className="flex cursor-pointer items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition hover:bg-purple-700">
+      <Upload size={18} />
 
       {uploading ? "Uploading..." : "Upload PDF"}
 

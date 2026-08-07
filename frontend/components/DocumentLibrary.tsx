@@ -18,7 +18,7 @@ export default function DocumentLibrary() {
       const token = localStorage.getItem("access_token");
 
       const response = await fetch(
-        "http://127.0.0.1:8000/documents",
+        `${process.env.NEXT_PUBLIC_API_URL}/documents`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -54,7 +54,7 @@ export default function DocumentLibrary() {
       const token = localStorage.getItem("access_token");
 
       const response = await fetch(
-        `http://127.0.0.1:8000/documents/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -83,8 +83,8 @@ export default function DocumentLibrary() {
   }, []);
 
   return (
-    <div className="rounded-2xl bg-[#111827] p-6">
-      <h2 className="mb-6 text-xl font-semibold text-white">
+    <div>
+      <h2 className="mb-4 text-xl font-semibold text-white">
         Uploaded Documents
       </h2>
 
