@@ -1,3 +1,6 @@
+
+print("========== GEMINI SERVICE LOADED ==========")
+print(__file__)
 import os
 from dotenv import load_dotenv
 from google import genai
@@ -11,7 +14,7 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.5-flash"
 
 print("========== GEMINI SERVICE LOADED ==========")
 print("Using model:", MODEL)
