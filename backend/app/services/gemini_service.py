@@ -11,10 +11,15 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
+MODEL = "gemini-2.5-flash"
+
+print("========== GEMINI SERVICE LOADED ==========")
+print("Using model:", MODEL)
+
 
 def summarize_document(question, context):
     """
-    Generates a summary ONLY from the uploaded document.
+    Returns an answer ONLY from the uploaded document.
     """
 
     if not context.strip():
@@ -26,11 +31,10 @@ You are WATCHTOWER.
 Your ONLY job is to answer using the uploaded document.
 
 Rules:
-- ONLY use the document.
+- ONLY use the uploaded document.
 - Do NOT use outside knowledge.
-- Summarize the relevant information.
 - Keep the answer concise.
-- If the document does not contain the answer, reply ONLY with:
+- If the answer is not present, reply ONLY with:
 
 NOT_FOUND
 
@@ -41,72 +45,86 @@ Question:
 {question}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+    try:
+        print("Calling Gemini (Document Summary)...")
 
-    answer = response.text.strip()
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt,
+        )
 
-    if answer == "NOT_FOUND":
+        answer = response.text.strip()
+
+        print("Document Response:")
+        print(answer)
+
+        if answer == "NOT_FOUND":
+            return None
+
+        return answer
+
+    except Exception as e:
+        print("Gemini Document Error:")
+        print(type(e).__name__)
+        print(e)
         return None
-
-    return answer
 
 
 def explain_with_ai(question, document_answer=None):
     """
-    Generates an AI explanation.
-    If a document summary exists, it expands upon it.
-    Otherwise it answers using general knowledge.
+    Returns a general AI explanation.
     """
 
     if document_answer:
         prompt = f"""
 You are WATCHTOWER.
 
-The following answer was extracted from the uploaded document.
+The following answer came from the uploaded document.
 
 Document Answer:
 
 {document_answer}
 
-Your task:
+Expand upon it.
 
-- Expand upon the document.
-- Make it easier to understand.
-- Use your own knowledge where helpful.
-- Give practical examples.
-- Do NOT contradict the uploaded document.
-- Do NOT repeat the document word-for-word.
-- Assume the reader is a beginner.
+Requirements:
+- Explain simply.
+- Add useful examples.
+- Do not contradict the document.
+- Don't repeat it word-for-word.
 
-User Question:
+Question:
 {question}
 """
-
     else:
         prompt = f"""
 You are WATCHTOWER.
 
-The uploaded documents do not contain the requested information.
+The uploaded document does not contain the answer.
 
-Answer the user's question using your own knowledge.
+Answer using your own knowledge.
 
-Requirements:
-
-- Beginner friendly.
-- Clear explanation.
-- Practical examples.
-- Bullet points where appropriate.
-
-User Question:
+Question:
 {question}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+    try:
+        print("Calling Gemini (AI Explanation)...")
 
-    return response.text.strip()
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt,
+        )
+
+        answer = response.text.strip()
+
+        print("AI Response:")
+        print(answer)
+
+        return answer
+
+    except Exception as e:
+        print("Gemini AI Error:")
+        print(type(e).__name__)
+        print(e)
+        return "Unable to connect to the AI service."
