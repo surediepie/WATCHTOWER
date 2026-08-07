@@ -1,82 +1,117 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-export default function Navbar() {
-  const [loggedIn, setLoggedIn] = useState(false);
+const team = [
+  {
+    name: "Priyam Kumar",
+    role: "Team Lead • Backend & AI Engineer",
+    email: "priyam.stu@gmail.com",
+  },
+  {
+    name: "Pritam Nayak",
+    role: "System Integration Engineer",
+    email: "nayakpritam321@gmail.com",
+  },
+  {
+    name: "Somesh Jena",
+    role: "Frontend Engineer",
+    email: "someshjena014@gmail.com",
+  },
+  {
+    name: "Somanath Kundu",
+    role: "UI Engineer",
+    email: "kundusomanath918@gmail.com",
+  },
+];
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    setLoggedIn(!!token);
-  }, []);
-
-  function logout() {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
-    window.location.href = "/";
-  }
-
+export default function AboutPage() {
   return (
-    <nav className="flex items-center justify-between border-b border-gray-800 px-10 py-6">
-      {/* Logo */}
-      <Link
-        href="/"
-        className="text-2xl font-bold tracking-widest text-white"
-      >
-        WATCHTOWER
-      </Link>
+    <main className="min-h-screen bg-black text-white">
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <h1 className="mb-6 text-center text-5xl font-extrabold">
+          About <span className="text-purple-500">WATCHTOWER</span>
+        </h1>
 
-      {/* Navigation */}
-      <div className="flex items-center gap-10 text-sm uppercase tracking-widest text-gray-300">
-        <Link href="/">Home</Link>
+        <p className="mx-auto mb-16 max-w-4xl text-center text-lg text-gray-400">
+          WATCHTOWER is an AI-powered document intelligence platform designed to
+          help students, faculty, and institutions search, understand, and
+          verify information across institutional documents using semantic
+          search, Retrieval-Augmented Generation (RAG), and Google Gemini AI.
+        </p>
 
-        <Link
-          href="https://github.com/surediepie/WATCHTOWER"
-          target="_blank"
-        >
-          GitHub
-        </Link>
+        <h2 className="mb-8 text-3xl font-bold">Our Team</h2>
 
-        <Link href="/about">
-          About Us
-        </Link>
+        <div className="grid gap-8 md:grid-cols-2">
+          {team.map((member) => (
+            <div
+              key={member.name}
+              className="rounded-2xl border border-gray-800 bg-[#111827] p-8 transition duration-300 hover:border-purple-500 hover:shadow-xl hover:shadow-purple-500/20"
+            >
+              <h3 className="text-2xl font-bold">{member.name}</h3>
+
+              <p className="mt-2 font-medium text-purple-400">
+                {member.role}
+              </p>
+
+              <p className="mt-5 text-gray-300">
+                📧 {member.email}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-20 rounded-2xl border border-gray-800 bg-[#111827] p-10">
+          <h2 className="mb-6 text-3xl font-bold">
+            Project Information
+          </h2>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <h3 className="mb-2 font-semibold text-purple-400">
+                Project
+              </h3>
+              <p>WATCHTOWER</p>
+            </div>
+
+
+            <div>
+              <h3 className="mb-2 font-semibold text-purple-400">
+                Repository
+              </h3>
+
+              <Link
+                href="https://github.com/surediepie/WATCHTOWER"
+                target="_blank"
+                className="text-blue-400 hover:underline"
+              >
+                github.com/surediepie/WATCHTOWER
+              </Link>
+            </div>
+
+            <div>
+              <h3 className="mb-2 font-semibold text-purple-400">
+                Tech Stack
+              </h3>
+
+              <p>
+                Next.js • FastAPI • ChromaDB • Sentence Transformers • Gemini AI
+                • Tailwind CSS
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-20 rounded-2xl border border-purple-700 bg-purple-900/10 p-10">
+          <h2 className="mb-4 text-3xl font-bold">
+            Our Mission
+          </h2>
+
+          <p className="text-lg leading-8 text-gray-300">
+            WATCHTOWER empowers students and institutions with trustworthy,
+            AI-powered access to institutional knowledge through intelligent
+            document search, semantic retrieval, and citation-backed responses.
+          </p>
+        </div>
       </div>
-
-      {/* Auth Buttons */}
-      {loggedIn ? (
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-purple-600 px-6 py-2 text-white transition hover:bg-purple-700"
-          >
-            Dashboard
-          </Link>
-
-          <button
-            onClick={logout}
-            className="rounded-full border border-red-500 px-6 py-2 text-red-400 transition hover:bg-red-500/10"
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="rounded-full border border-gray-600 px-6 py-2 text-white transition hover:bg-gray-800"
-          >
-            Sign In
-          </Link>
-
-          <Link
-            href="/register"
-            className="rounded-full bg-purple-600 px-6 py-2 text-white transition hover:bg-purple-700"
-          >
-            Create Account
-          </Link>
-        </div>
-      )}
-    </nav>
+    </main>
   );
 }
