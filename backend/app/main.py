@@ -1,26 +1,38 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    Depends,
+    HTTPException,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 import os
 import shutil
+
+from app.database import get_db, engine, Base
+import app.models
+
+from app.models import User
+from app.schemas import UserCreate, UserLogin
+from app.auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+)
 
 from app.services.pdf_service import extract_text
 from app.services.chunk_service import chunk_text
 from app.services.vector_service import store_chunks
 from app.services.search_service import search_documents
 from app.services.gemini_service import ask_gemini
-from sqlalchemy.orm import Session
-from fastapi import Depends
 
-from app.database import get_db
-from app.models import User
-from app.schemas import UserCreate
-from app.auth import hash_password
-from app.database import engine, Base
-import app.models
 
 app = FastAPI(title="WATCHTOWER API")
+
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 # CORS
@@ -44,6 +56,9 @@ def root():
     return {"message": "WATCHTOWER Backend Running"}
 
 
+# -----------------------------
+# Upload PDF
+# -----------------------------
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
@@ -55,11 +70,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
-    print("About to call store_chunks()")
-
     store_chunks(chunks, file.filename)
-
-    print("Returned from store_chunks()")
 
     return {
         "filename": file.filename,
@@ -68,6 +79,10 @@ async def upload_pdf(file: UploadFile = File(...)):
         "preview": chunks[0],
     }
 
+
+# -----------------------------
+# List Uploaded Documents
+# -----------------------------
 @app.get("/documents")
 def get_documents():
     documents = []
@@ -76,27 +91,40 @@ def get_documents():
         path = os.path.join(UPLOAD_FOLDER, filename)
 
         if os.path.isfile(path):
-            documents.append({
-                "name": filename,
-                "size": round(os.path.getsize(path) / 1024, 2)
-            })
+            documents.append(
+                {
+                    "name": filename,
+                    "size": round(os.path.getsize(path) / 1024, 2),
+                }
+            )
 
     return documents
 
-class ChatRequest(BaseModel):
-    question: str
 
+# -----------------------------
+# Register
+# -----------------------------
 @app.post("/register")
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == user.email).first()
+def register(
+    user: UserCreate,
+    db: Session = Depends(get_db),
+):
+    existing_user = (
+        db.query(User)
+        .filter(User.email == user.email)
+        .first()
+    )
 
     if existing_user:
-        return {"message": "Email already registered"}
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered",
+        )
 
     new_user = User(
         name=user.name,
         email=user.email,
-        password=hash_password(user.password)
+        password=hash_password(user.password),
     )
 
     db.add(new_user)
@@ -108,9 +136,61 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         "user": {
             "id": new_user.id,
             "name": new_user.name,
-            "email": new_user.email
-        }
+            "email": new_user.email,
+        },
     }
+
+
+# -----------------------------
+# Login
+# -----------------------------
+@app.post("/login")
+def login(
+    user: UserLogin,
+    db: Session = Depends(get_db),
+):
+    existing_user = (
+        db.query(User)
+        .filter(User.email == user.email)
+        .first()
+    )
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password",
+        )
+
+    if not verify_password(
+        user.password,
+        existing_user.password,
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password",
+        )
+
+    token = create_access_token(
+        {"sub": existing_user.email}
+    )
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": existing_user.id,
+            "name": existing_user.name,
+            "email": existing_user.email,
+        },
+    }
+
+
+# -----------------------------
+# Chat
+# -----------------------------
+class ChatRequest(BaseModel):
+    question: str
+
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -120,7 +200,10 @@ async def chat(request: ChatRequest):
         source["text"] for source in results
     )
 
-    answer = ask_gemini(request.question, context)
+    answer = ask_gemini(
+        request.question,
+        context,
+    )
 
     return {
         "question": request.question,
