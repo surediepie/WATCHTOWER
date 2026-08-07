@@ -1,5 +1,3 @@
-print("HELLO FROM VECTOR SERVICE")
-
 import chromadb
 from sentence_transformers import SentenceTransformer
 

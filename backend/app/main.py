@@ -95,11 +95,22 @@ async def upload_pdf(
     print("Chunks:", len(chunks))
     print("Chunks created:", len(chunks))
 
-    store_chunks(
-    chunks,
-    current_user.id,
-    file.filename,
-)
+    try:
+        print("Calling store_chunks...")
+
+        store_chunks(
+            chunks,
+            current_user.id,
+            file.filename,
+        )
+
+        print("store_chunks finished.")
+
+    except Exception as e:
+        print("STORE CHUNKS ERROR:")
+        print(type(e).__name__)
+        print(e)
+        raise
 
     create_document(
         db=db,
@@ -114,7 +125,6 @@ async def upload_pdf(
         "pages": len(pages),
         "chunks": len(chunks),
     }
-
 
 # -------------------------------------------------
 # Documents
