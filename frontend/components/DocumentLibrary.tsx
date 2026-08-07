@@ -12,15 +12,40 @@ export default function DocumentLibrary() {
   const [documents, setDocuments] = useState<Document[]>([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/documents")
-      .then((res) => res.json())
-      .then((data) => setDocuments(data))
-      .catch((err) => console.error(err));
+    async function loadDocuments() {
+      try {
+        const token = localStorage.getItem("access_token");
+
+        const response = await fetch(
+          "http://127.0.0.1:8000/documents",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error(data);
+          setDocuments([]);
+          return;
+        }
+
+        setDocuments(data);
+      } catch (err) {
+        console.error(err);
+        setDocuments([]);
+      }
+    }
+
+    loadDocuments();
   }, []);
 
   return (
     <div className="rounded-2xl bg-[#111827] p-6">
-      <h2 className="mb-6 text-xl font-semibold">
+      <h2 className="mb-6 text-xl font-semibold text-white">
         Uploaded Documents
       </h2>
 

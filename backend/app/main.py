@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 import os
 import shutil
 
-from app.database import get_db, engine, Base
+from app.database import Base, engine, get_db
 import app.models
 
 from app.models import User
@@ -22,21 +22,22 @@ from app.auth import (
     verify_password,
     create_access_token,
 )
+from app.dependencies import get_current_user
 
 from app.services.pdf_service import extract_text
 from app.services.chunk_service import chunk_text
 from app.services.vector_service import store_chunks
 from app.services.search_service import search_documents
 from app.services.gemini_service import ask_gemini
-from app.dependencies import get_current_user
-
+from app.services.document_service import (
+    create_document,
+    get_user_documents,
+)
 
 app = FastAPI(title="WATCHTOWER API")
 
-# Create database tables
 Base.metadata.create_all(bind=engine)
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -57,15 +58,20 @@ def root():
     return {"message": "WATCHTOWER Backend Running"}
 
 
-# -----------------------------
+# -------------------------------------------------
 # Upload PDF
-# -----------------------------
+# -------------------------------------------------
+
 @app.post("/upload")
 async def upload_pdf(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        file.filename,
+    )
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -74,42 +80,55 @@ async def upload_pdf(
 
     chunks = chunk_text(text)
 
-    store_chunks(chunks, file.filename)
+    store_chunks(
+        chunks,
+        current_user.id,
+        file.filename,
+    )
+
+    create_document(
+        db=db,
+        filename=file.filename,
+        size=os.path.getsize(file_path),
+        user_id=current_user.id,
+    )
 
     return {
+        "message": "Upload successful",
         "filename": file.filename,
         "characters": len(text),
         "chunks": len(chunks),
-        "preview": chunks[0],
     }
 
 
-# -----------------------------
-# List Uploaded Documents
-# -----------------------------
+# -------------------------------------------------
+# Documents
+# -------------------------------------------------
+
 @app.get("/documents")
-def get_documents(
+def documents(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    documents = []
+    docs = get_user_documents(
+        db,
+        current_user.id,
+    )
 
-    for filename in os.listdir(UPLOAD_FOLDER):
-        path = os.path.join(UPLOAD_FOLDER, filename)
-
-        if os.path.isfile(path):
-            documents.append(
-                {
-                    "name": filename,
-                    "size": round(os.path.getsize(path) / 1024, 2),
-                }
-            )
-
-    return documents
+    return [
+        {
+            "id": doc.id,
+            "name": doc.filename,
+            "size": round(doc.size / 1024, 2),
+        }
+        for doc in docs
+    ]
 
 
-# -----------------------------
+# -------------------------------------------------
 # Register
-# -----------------------------
+# -------------------------------------------------
+
 @app.post("/register")
 def register(
     user: UserCreate,
@@ -147,9 +166,10 @@ def register(
     }
 
 
-# -----------------------------
+# -------------------------------------------------
 # Login
-# -----------------------------
+# -------------------------------------------------
+
 @app.post("/login")
 def login(
     user: UserLogin,
@@ -191,9 +211,10 @@ def login(
     }
 
 
-# -----------------------------
+# -------------------------------------------------
 # Chat
-# -----------------------------
+# -------------------------------------------------
+
 class ChatRequest(BaseModel):
     question: str
 
@@ -203,10 +224,14 @@ async def chat(
     request: ChatRequest,
     current_user: User = Depends(get_current_user),
 ):
-    results = search_documents(request.question)
+    results = search_documents(
+        request.question,
+        current_user.id,
+    )
 
     context = "\n\n".join(
-        source["text"] for source in results
+        source["text"]
+        for source in results
     )
 
     answer = ask_gemini(

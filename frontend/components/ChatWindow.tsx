@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 
+interface Source {
+  text: string;
+  source: string;
+  distance: number;
+}
+
+interface Message {
+  role: "user" | "assistant";
+  text: string;
+  sources?: Source[];
+}
+
 export default function ChatWindow() {
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<
-    { role: string; text: string }[]
-  >([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function sendQuestion() {
@@ -16,35 +26,46 @@ export default function ChatWindow() {
 
     setMessages((prev) => [
       ...prev,
-      { role: "user", text: userQuestion },
+      {
+        role: "user",
+        text: userQuestion,
+      },
     ]);
 
     setQuestion("");
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: userQuestion,
-        }),
-      });
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            question: userQuestion,
+          }),
+        }
+      );
 
       const data = await response.json();
 
-console.log(data);
+      if (!response.ok) {
+        throw new Error(data.detail || "Chat failed");
+      }
 
-setMessages((prev) => [
-  ...prev,
-  {
-    role: "assistant",
-    text: data.answer,
-    sources: data.sources,
-  },
-]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: data.answer,
+          sources: data.sources,
+        },
+      ]);
     } catch (error) {
       console.error(error);
 
@@ -52,7 +73,7 @@ setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: "Something went wrong.",
+          text: "Unable to get a response.",
         },
       ]);
     } finally {

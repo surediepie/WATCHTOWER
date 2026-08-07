@@ -1,4 +1,5 @@
 print("HELLO FROM VECTOR SERVICE")
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
@@ -17,19 +18,30 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 print("Embedding model loaded!")
 
 
-def store_chunks(chunks, source):
+def store_chunks(chunks, user_id, source):
     print(f"Storing {len(chunks)} chunks...")
 
     embeddings = model.encode(chunks).tolist()
 
-    ids = [f"{source}_{i}" for i in range(len(chunks))]
+    ids = [
+        f"user{user_id}_{source}_{i}"
+        for i in range(len(chunks))
+    ]
+
+    metadatas = [
+        {
+            "user_id": user_id,
+            "source": source,
+        }
+        for _ in chunks
+    ]
 
     collection.add(
         ids=ids,
         documents=chunks,
         embeddings=embeddings,
-        metadatas=[{"source": source}] * len(chunks),
+        metadatas=metadatas,
     )
 
     print("Chunks stored successfully!")
-    print("Total documents in ChromaDB:", collection.count())
+    print("Total documents:", collection.count())
