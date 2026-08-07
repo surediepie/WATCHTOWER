@@ -28,6 +28,7 @@ from app.services.chunk_service import chunk_text
 from app.services.vector_service import store_chunks
 from app.services.search_service import search_documents
 from app.services.gemini_service import ask_gemini
+from app.dependencies import get_current_user
 
 
 app = FastAPI(title="WATCHTOWER API")
@@ -60,7 +61,10 @@ def root():
 # Upload PDF
 # -----------------------------
 @app.post("/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
 
     with open(file_path, "wb") as buffer:
@@ -84,7 +88,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 # List Uploaded Documents
 # -----------------------------
 @app.get("/documents")
-def get_documents():
+def get_documents(
+    current_user: User = Depends(get_current_user),
+):
     documents = []
 
     for filename in os.listdir(UPLOAD_FOLDER):
@@ -193,7 +199,10 @@ class ChatRequest(BaseModel):
 
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
+async def chat(
+    request: ChatRequest,
+    current_user: User = Depends(get_current_user),
+):
     results = search_documents(request.question)
 
     context = "\n\n".join(
