@@ -3,22 +3,22 @@ import Link from "next/link";
 const team = [
   {
     name: "Priyam Kumar",
-    role: "Team Lead • Backend & AI Engineer",
+    role: "Team Lead • Worked on Backend & AI",
     email: "priyam.stu@gmail.com",
   },
   {
     name: "Pritam Nayak",
-    role: "System Integration Engineer",
+    role: "Worked on System Integration",
     email: "nayakpritam321@gmail.com",
   },
   {
     name: "Somesh Jena",
-    role: "Frontend Engineer",
+    role: "Worked on Frontend",
     email: "someshjena014@gmail.com",
   },
   {
     name: "Somanath Kundu",
-    role: "UI Engineer",
+    role: "Worked on UI",
     email: "kundusomanath918@gmail.com",
   },
 ];
