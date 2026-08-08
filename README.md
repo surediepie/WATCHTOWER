@@ -178,7 +178,7 @@ WATCHTOWER/
 
 ## 💬 AI Chat
 
-![Chat](screenshots/CHAT.png)
+![Chats](screenshots/CHATS.png)
 
 ---
 
