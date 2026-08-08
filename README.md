@@ -24,47 +24,7 @@ WATCHTOWER is an AI-powered document intelligence platform that enables users to
 
 Instead of manually searching through lengthy PDFs, users can upload documents and ask natural language questions. WATCHTOWER retrieves the most relevant information using semantic search and generates accurate, context-aware answers with Google Gemini AI.
 
----
 
-<<<<<<< HEAD
-# 📸 Screenshots
-
-## 🏠 Landing Page
-
-![Landing](screenshots/LANDING.png)
-
----
-
-## 🔐 Login
-
-![Login](screenshots/LOGIN.png)
-
----
-
-## 📝 Register
-
-![Register](screenshots/REGISTER.png)
-
----
-
-## 📊 Dashboard
-
-![Dashboard](screenshots/DASHBOARD.png)
-
----
-
-## 💬 AI Chat
-
-![Chat](screenshots/CHAT.png)
-
----
-
-## 👥 About Us
-
-![About](screenshots/ABOUT%20US.png)
-
-=======
->>>>>>> 6f65856 (Add project screenshots to README)
 # Problem Statement
 
 Students and professionals often spend significant time searching through large documents such as:
@@ -147,6 +107,8 @@ WATCHTOWER solves this problem using semantic search and AI-powered document und
 - JWT Authentication
 - PyMuPDF
 
+
+
 ## Artificial Intelligence
 
 - Google Gemini 3.5 Flash
@@ -187,6 +149,43 @@ WATCHTOWER/
 ```
 
 ---
+
+# 📸 Screenshots
+
+## 🏠 Landing Page
+
+![Landing](screenshots/LANDING.png)
+
+---
+
+## 🔐 Login
+
+![Login](screenshots/LOGIN.png)
+
+---
+
+## 📝 Register
+
+![Register](screenshots/REGISTER.png)
+
+---
+
+## 📊 Dashboard
+
+![Dashboard](screenshots/DASHBOARD.png)
+
+---
+
+## 💬 AI Chat
+
+![Chat](screenshots/CHAT.png)
+
+---
+
+## 👥 About Us
+
+![About](screenshots/ABOUT%20US.png)
+
 
 # Installation
 
