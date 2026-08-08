@@ -26,6 +26,7 @@ Instead of manually searching through lengthy PDFs, users can upload documents a
 
 ---
 
+<<<<<<< HEAD
 # 📸 Screenshots
 
 ## 🏠 Landing Page
@@ -62,6 +63,8 @@ Instead of manually searching through lengthy PDFs, users can upload documents a
 
 ![About](screenshots/ABOUT%20US.png)
 
+=======
+>>>>>>> 6f65856 (Add project screenshots to README)
 # Problem Statement
 
 Students and professionals often spend significant time searching through large documents such as:
@@ -269,4 +272,8 @@ This project is licensed under the MIT License.
 
 *"Every Answer. Verified. Every Source. Within Reach."*
 
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> 6f65856 (Add project screenshots to README)
