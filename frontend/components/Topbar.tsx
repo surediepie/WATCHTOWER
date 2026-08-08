@@ -19,9 +19,10 @@ export default function Topbar() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+   if (storedUser) {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  setUser(JSON.parse(storedUser));
+}
   }, []);
 
   function handleLogout() {

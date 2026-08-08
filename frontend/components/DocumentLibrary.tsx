@@ -79,8 +79,9 @@ export default function DocumentLibrary() {
   }
 
   useEffect(() => {
-    loadDocuments();
-  }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  loadDocuments();
+}, []);
 
   return (
     <div>

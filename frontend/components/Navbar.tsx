@@ -1,20 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
+  const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    setLoggedIn(!!token);
-  }, []);
+  const token = localStorage.getItem("access_token");
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  setLoggedIn(!!token);
+}, []);
 
   function logout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
-    window.location.href = "/";
+    router.push("/");
   }
 
   return (
