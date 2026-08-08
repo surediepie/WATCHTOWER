@@ -26,6 +26,42 @@ Instead of manually searching through lengthy PDFs, users can upload documents a
 
 ---
 
+# 📸 Screenshots
+
+## 🏠 Landing Page
+
+![Landing](screenshots/LANDING.png)
+
+---
+
+## 🔐 Login
+
+![Login](screenshots/LOGIN.png)
+
+---
+
+## 📝 Register
+
+![Register](screenshots/REGISTER.png)
+
+---
+
+## 📊 Dashboard
+
+![Dashboard](screenshots/DASHBOARD.png)
+
+---
+
+## 💬 AI Chat
+
+![Chat](screenshots/CHAT.png)
+
+---
+
+## 👥 About Us
+
+![About](screenshots/ABOUT%20US.png)
+
 # Problem Statement
 
 Students and professionals often spend significant time searching through large documents such as:
