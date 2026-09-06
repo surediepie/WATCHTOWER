@@ -15,7 +15,7 @@ const team = [
     name: "Somesh Jena",
     role: "Worked on Frontend",
     email: "someshjena014@gmail.com",
-  },
+  },0
   {
     name: "Somanath Kundu",
     role: "Worked on UI",
