@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
@@ -41,13 +40,12 @@ export default function Hero() {
       {/* Right */}
       <div className="flex shrink-0 items-center justify-center">
         <div className="flex h-[400px] w-[400px] items-center justify-center rounded-2xl border border-gray-700 bg-[#111827] shadow-2xl lg:h-[500px] lg:w-[500px]">
-          <Image
+          <img
             src="/WATCHTOWER_logo.jpg"
             alt="WATCHTOWER Logo"
-            width={420}
-            height={420}
-            priority
-            className="object-contain"
+            width="420"
+            height="420"
+            className="h-auto max-h-[420px] w-auto max-w-[420px] object-contain"
           />
         </div>
       </div>
