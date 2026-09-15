@@ -8,13 +8,11 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-
 import os
 import shutil
 
 from app.database import Base, engine, get_db
 import app.models
-
 from app.models import User
 from app.schemas import UserCreate, UserLogin
 from app.auth import (
@@ -23,7 +21,6 @@ from app.auth import (
     create_access_token,
 )
 from app.dependencies import get_current_user
-
 from app.services.pdf_service import extract_text
 from app.services.chunk_service import chunk_text
 from app.services.vector_service import (
@@ -31,7 +28,6 @@ from app.services.vector_service import (
     delete_document_embeddings,
     search_documents,
 )
-
 from app.services.gemini_service import (
     summarize_document,
     explain_with_ai,
@@ -43,9 +39,24 @@ from app.services.document_service import (
     delete_document,
 )
 
+
+# -------------------------------------------------
+# FastAPI App
+# -------------------------------------------------
+
 app = FastAPI(title="WATCHTOWER API")
 
+
+# -------------------------------------------------
+# Database
+# -------------------------------------------------
+
 Base.metadata.create_all(bind=engine)
+
+
+# -------------------------------------------------
+# CORS
+# -------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -59,13 +70,73 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "/tmp/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# -------------------------------------------------
+# Vercel Services Prefix Middleware
+# -------------------------------------------------
+
+class ServicePrefixMiddleware:
+    def __init__(self, app, prefix: str) -> None:
+        self.app = app
+        self.prefix = prefix
+        self.prefix_bytes = prefix.encode()
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] in {"http", "websocket"}:
+            path = scope.get("path", "")
+
+            if path == self.prefix or path.startswith(
+                f"{self.prefix}/"
+            ):
+                scope = {
+                    **scope,
+                    "path": path[len(self.prefix):] or "/",
+                    "root_path": (
+                        f"{scope.get('root_path', '')}"
+                        f"{self.prefix}"
+                    ),
+                }
+
+                raw_path = scope.get("raw_path")
+
+                if (
+                    isinstance(raw_path, bytes)
+                    and raw_path.startswith(self.prefix_bytes)
+                ):
+                    scope["raw_path"] = (
+                        raw_path[len(self.prefix_bytes):] or b"/"
+                    )
+
+        await self.app(scope, receive, send)
+
+
+app.add_middleware(
+    ServicePrefixMiddleware,
+    prefix="/svc/api",
+)
+
+
+# -------------------------------------------------
+# Upload Configuration
+# -------------------------------------------------
+
+UPLOAD_FOLDER = "/tmp/uploads"
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True,
+)
+
+
+# -------------------------------------------------
+# Root
+# -------------------------------------------------
 
 @app.get("/")
 def root():
-    return {"message": "WATCHTOWER Backend Running"}
+    return {
+        "message": "WATCHTOWER Backend Running"
+    }
 
 
 # -------------------------------------------------
@@ -84,17 +155,19 @@ async def upload_pdf(
     )
 
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(
+            file.file,
+            buffer,
+        )
 
     pages = extract_text(file_path)
+
     print("Pages:", len(pages))
-    print(pages[:2])
-    print("Pages extracted:", len(pages))
     print(pages[:2])
 
     chunks = chunk_text(pages)
+
     print("Chunks:", len(chunks))
-    print("Chunks created:", len(chunks))
 
     document = create_document(
         db=db,
@@ -105,13 +178,16 @@ async def upload_pdf(
 
     try:
         print("Calling store_chunks...")
+
         store_chunks(
             chunks,
             current_user.id,
             file.filename,
             document.id,
         )
+
         print("store_chunks finished.")
+
     except Exception as e:
         print("STORE CHUNKS ERROR:")
         print(type(e).__name__)
@@ -124,6 +200,7 @@ async def upload_pdf(
         "pages": len(pages),
         "chunks": len(chunks),
     }
+
 
 # -------------------------------------------------
 # Documents
@@ -143,10 +220,18 @@ def documents(
         {
             "id": doc.id,
             "name": doc.filename,
-            "size": round(doc.size / 1024, 2),
+            "size": round(
+                doc.size / 1024,
+                2,
+            ),
         }
         for doc in docs
     ]
+
+
+# -------------------------------------------------
+# Delete Document
+# -------------------------------------------------
 
 @app.delete("/documents/{document_id}")
 def delete_user_document(
@@ -278,14 +363,6 @@ def login(
             "email": existing_user.email,
         },
     }
-
-
-# -------------------------------------------------
-# Chat
-# -------------------------------------------------
-
-class ChatRequest(BaseModel):
-    question: str
 
 
 # -------------------------------------------------
