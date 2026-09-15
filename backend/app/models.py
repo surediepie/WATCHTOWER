@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from pgvector.sqlalchemy import Vector
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -56,7 +57,5 @@ class DocumentChunk(Base):
     page = Column(Integer, nullable=False)
     text = Column(Text, nullable=False)
 
-    # Stored as JSON text to avoid adding pgvector or another dependency.
-    embedding = Column(Text, nullable=False)
-
+    embedding = Column(Vector(768), nullable=False)
     document = relationship("Document", back_populates="chunks")

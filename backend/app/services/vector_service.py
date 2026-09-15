@@ -1,14 +1,24 @@
-import json
-import math
+import os
 
+from dotenv import load_dotenv
 from google import genai
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
 from app.models import DocumentChunk
 
 
-client = genai.Client()
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    raise RuntimeError(
+        "GEMINI_API_KEY environment variable is not configured"
+    )
+
+client = genai.Client(api_key=api_key)
 
 EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMENSION = 768
@@ -43,7 +53,7 @@ def store_chunks(chunks, user_id, source, document_id):
                 source=source,
                 page=chunk["page"],
                 text=chunk["text"],
-                embedding=json.dumps(embedding),
+                embedding=embedding,
             )
 
             db.add(db_chunk)
@@ -84,18 +94,6 @@ def delete_document_embeddings(user_id, source):
         db.close()
 
 
-def cosine_similarity(a, b):
-    dot_product = sum(x * y for x, y in zip(a, b))
-
-    magnitude_a = math.sqrt(sum(x * x for x in a))
-    magnitude_b = math.sqrt(sum(y * y for y in b))
-
-    if magnitude_a == 0 or magnitude_b == 0:
-        return 0.0
-
-    return dot_product / (magnitude_a * magnitude_b)
-
-
 def search_documents(query, user_id, n_results=5):
     db: Session = SessionLocal()
 
@@ -105,40 +103,28 @@ def search_documents(query, user_id, n_results=5):
             "RETRIEVAL_QUERY",
         )
 
-        chunks = (
-            db.query(DocumentChunk)
-            .filter(DocumentChunk.user_id == user_id)
-            .all()
+        distance = DocumentChunk.embedding.cosine_distance(
+            query_embedding
         )
 
-        scored_chunks = []
-
-        for chunk in chunks:
-            embedding = json.loads(chunk.embedding)
-
-            similarity = cosine_similarity(
-                query_embedding,
-                embedding,
-            )
-
-            scored_chunks.append(
-                (similarity, chunk)
-            )
-
-        scored_chunks.sort(
-            key=lambda item: item[0],
-            reverse=True,
+        statement = (
+            select(DocumentChunk, distance.label("distance"))
+            .where(DocumentChunk.user_id == user_id)
+            .order_by(distance)
+            .limit(n_results)
         )
+
+        rows = db.execute(statement).all()
 
         results = []
 
-        for similarity, chunk in scored_chunks[:n_results]:
+        for chunk, distance_value in rows:
             results.append(
                 {
                     "text": chunk.text,
                     "source": chunk.source,
                     "page": chunk.page,
-                    "distance": 1 - similarity,
+                    "distance": float(distance_value),
                 }
             )
 
