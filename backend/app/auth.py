@@ -1,12 +1,22 @@
-from passlib.context import CryptContext
-from jose import jwt
+import os
 from datetime import datetime, timedelta
 
-SECRET_KEY = "watchtower-secret-key-change-this-later"
+from passlib.context import CryptContext
+from jose import jwt
+
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not configured")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+)
 
 
 def hash_password(password: str):
