@@ -29,8 +29,9 @@ from app.services.chunk_service import chunk_text
 from app.services.vector_service import (
     store_chunks,
     delete_document_embeddings,
+    search_documents,
 )
-from app.services.search_service import search_documents
+
 from app.services.gemini_service import (
     summarize_document,
     explain_with_ai,
@@ -95,29 +96,27 @@ async def upload_pdf(
     print("Chunks:", len(chunks))
     print("Chunks created:", len(chunks))
 
-    try:
-        print("Calling store_chunks...")
-
-        store_chunks(
-            chunks,
-            current_user.id,
-            file.filename,
-        )
-
-        print("store_chunks finished.")
-
-    except Exception as e:
-        print("STORE CHUNKS ERROR:")
-        print(type(e).__name__)
-        print(e)
-        raise
-
-    create_document(
+    document = create_document(
         db=db,
         filename=file.filename,
         size=os.path.getsize(file_path),
         user_id=current_user.id,
     )
+
+    try:
+        print("Calling store_chunks...")
+        store_chunks(
+            chunks,
+            current_user.id,
+            file.filename,
+            document.id,
+        )
+        print("store_chunks finished.")
+    except Exception as e:
+        print("STORE CHUNKS ERROR:")
+        print(type(e).__name__)
+        print(e)
+        raise
 
     return {
         "message": "Upload successful",
