@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex min-h-[90vh] max-w-7xl items-center justify-between px-6">
+    <section className="mx-auto flex min-h-[90vh] max-w-7xl flex-col items-center justify-center gap-12 px-6 lg:flex-row lg:justify-between">
       {/* Left */}
       <div className="max-w-2xl">
         <h1 className="text-6xl font-extrabold leading-tight text-white">
@@ -39,8 +39,8 @@ export default function Hero() {
       </div>
 
       {/* Right */}
-      <div className="flex items-center justify-center">
-        <div className="flex h-[500px] w-[500px] items-center justify-center rounded-2xl border border-gray-700 bg-[#111827] shadow-2xl">
+      <div className="flex shrink-0 items-center justify-center">
+        <div className="flex h-[400px] w-[400px] items-center justify-center rounded-2xl border border-gray-700 bg-[#111827] shadow-2xl lg:h-[500px] lg:w-[500px]">
           <Image
             src="/WATCHTOWER_logo.jpg"
             alt="WATCHTOWER Logo"
